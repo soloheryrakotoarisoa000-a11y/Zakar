@@ -1,0 +1,6 @@
+{
+  "name": "MPAMPAHATSIARO – זָכַר",
+  "description": "Assistante personnelle intelligente du ministère pastoral – MPAMPAHATSIARO זָכַר (ZAKAR). Créé par Solohery RAKOTOARISOA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
