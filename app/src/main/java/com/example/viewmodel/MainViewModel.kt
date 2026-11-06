@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alarm.AlarmScheduler
+import com.example.alarm.RingtoneHelper
+import com.example.alarm.RingtoneOption
 import com.example.assistant.MinistryNlpParser
 import com.example.assistant.MissingField
 import com.example.assistant.ParsedTaskIntent
@@ -92,6 +94,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope,
         SharingStarted.Eagerly,
         "SYSTEM"
+    )
+
+    val alarmRingtoneUri = preferencesManager.alarmRingtoneUriFlow.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        ""
+    )
+
+    val alarmRingtoneTitle = preferencesManager.alarmRingtoneTitleFlow.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        "Alarme par défaut"
     )
 
     // App Lock State
@@ -194,6 +208,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             preferencesManager.setThemeMode(mode)
         }
+    }
+
+    fun setAlarmRingtone(uriString: String, title: String) {
+        viewModelScope.launch {
+            preferencesManager.setAlarmRingtone(uriString, title)
+        }
+    }
+
+    fun getDeviceRingtones(): List<RingtoneOption> {
+        return RingtoneHelper.getDeviceRingtones(getApplication())
+    }
+
+    fun playRingtonePreview(uriString: String) {
+        RingtoneHelper.playPreview(getApplication(), uriString)
+    }
+
+    fun stopRingtonePreview() {
+        RingtoneHelper.stopPreview()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        RingtoneHelper.stopPreview()
     }
 
     // Task Management

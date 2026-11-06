@@ -21,6 +21,8 @@ class PreferencesManager(private val context: Context) {
     private val KEY_VIBRATION_ENABLED = booleanPreferencesKey("vibration_enabled")
     private val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
     private val KEY_FIRST_LAUNCH = booleanPreferencesKey("first_launch_done")
+    private val KEY_ALARM_RINGTONE_URI = stringPreferencesKey("alarm_ringtone_uri")
+    private val KEY_ALARM_RINGTONE_TITLE = stringPreferencesKey("alarm_ringtone_title")
 
     val appLanguageFlow: Flow<AppLanguage?> = context.dataStore.data.map { prefs ->
         val code = prefs[KEY_APP_LANGUAGE]
@@ -53,6 +55,14 @@ class PreferencesManager(private val context: Context) {
 
     val themeModeFlow: Flow<String> = context.dataStore.data.map { prefs ->
         prefs[KEY_THEME_MODE] ?: "SYSTEM"
+    }
+
+    val alarmRingtoneUriFlow: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[KEY_ALARM_RINGTONE_URI] ?: ""
+    }
+
+    val alarmRingtoneTitleFlow: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[KEY_ALARM_RINGTONE_TITLE] ?: "Alarme par défaut"
     }
 
     suspend fun setLanguage(language: AppLanguage) {
@@ -90,6 +100,13 @@ class PreferencesManager(private val context: Context) {
     suspend fun setThemeMode(mode: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_THEME_MODE] = mode
+        }
+    }
+
+    suspend fun setAlarmRingtone(uriString: String, title: String) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_ALARM_RINGTONE_URI] = uriString
+            prefs[KEY_ALARM_RINGTONE_TITLE] = title
         }
     }
 

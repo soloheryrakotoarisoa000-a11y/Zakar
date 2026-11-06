@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
@@ -32,7 +33,10 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.MinistryTask
 import com.example.localization.TranslationStrings
+import com.example.ui.components.RingtonePickerDialog
 import com.example.ui.theme.DivineGold
 import com.example.ui.theme.MidnightBlue
 import com.example.viewmodel.MainViewModel
@@ -54,10 +59,14 @@ import java.util.Locale
 fun AlarmsScreen(
     strings: TranslationStrings,
     alarms: List<MinistryTask>,
+    currentRingtoneUri: String,
+    currentRingtoneTitle: String,
+    onRingtoneChange: (String, String) -> Unit,
     onToggleAlarm: (MinistryTask) -> Unit,
     onTestAlarm: () -> Unit
 ) {
     val context = LocalContext.current
+    var showRingtonePicker by remember { mutableStateOf(false) }
     val dateTimeFormat = remember { SimpleDateFormat("EEEE d MMMM yyyy à HH:mm", Locale.getDefault()) }
 
     Column(
@@ -126,6 +135,69 @@ fun AlarmsScreen(
                     modifier = Modifier.testTag("test_alarm_button")
                 ) {
                     Text(text = "Tester", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                }
+            }
+        }
+
+        // Access Phone Ringtones Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 2.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(DivineGold.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MusicNote,
+                        contentDescription = null,
+                        tint = DivineGold,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = strings.alarmRingtoneTitle,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = currentRingtoneTitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = DivineGold,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Button(
+                    onClick = { showRingtonePicker = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DivineGold,
+                        contentColor = MidnightBlue
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                    modifier = Modifier.testTag("change_ringtone_button")
+                ) {
+                    Text(text = "Changer", fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 }
             }
         }
@@ -223,5 +295,18 @@ fun AlarmsScreen(
                 }
             }
         }
+    }
+
+    if (showRingtonePicker) {
+        RingtonePickerDialog(
+            strings = strings,
+            currentRingtoneUri = currentRingtoneUri,
+            currentRingtoneTitle = currentRingtoneTitle,
+            onDismiss = { showRingtonePicker = false },
+            onSelectRingtone = { uri, title ->
+                onRingtoneChange(uri, title)
+                showRingtonePicker = false
+            }
+        )
     }
 }

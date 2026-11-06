@@ -110,6 +110,8 @@ fun ZakarAppScaffold(
     appLockPin: String,
     vibrationEnabled: Boolean,
     themeMode: String,
+    currentRingtoneUri: String,
+    currentRingtoneTitle: String,
     onNavigate: (NavDestination) -> Unit,
     onToggleTaskComplete: (MinistryTask) -> Unit,
     onSaveTask: (MinistryTask) -> Unit,
@@ -129,6 +131,7 @@ fun ZakarAppScaffold(
     onAppLockChange: (Boolean, String) -> Unit,
     onVibrationChange: (Boolean) -> Unit,
     onThemeChange: (String) -> Unit,
+    onRingtoneChange: (String, String) -> Unit,
     onExportBackup: ((String) -> Unit) -> Unit,
     onImportBackup: (String, (Boolean) -> Unit) -> Unit
 ) {
@@ -399,6 +402,9 @@ fun ZakarAppScaffold(
                     NavDestination.ALARMS -> AlarmsScreen(
                         strings = strings,
                         alarms = alarmsList,
+                        currentRingtoneUri = currentRingtoneUri,
+                        currentRingtoneTitle = currentRingtoneTitle,
+                        onRingtoneChange = onRingtoneChange,
                         onToggleAlarm = { task -> onSaveTask(task.copy(hasAlarm = !task.hasAlarm)) },
                         onTestAlarm = onTriggerTestAlarm
                     )
@@ -419,11 +425,14 @@ fun ZakarAppScaffold(
                         currentPin = appLockPin,
                         vibrationEnabled = vibrationEnabled,
                         themeMode = themeMode,
+                        currentRingtoneUri = currentRingtoneUri,
+                        currentRingtoneTitle = currentRingtoneTitle,
                         onLanguageChange = onLanguageChange,
                         onTitleChange = onTitleChange,
                         onAppLockChange = onAppLockChange,
                         onVibrationChange = onVibrationChange,
                         onThemeChange = onThemeChange,
+                        onRingtoneChange = onRingtoneChange,
                         onExportBackup = onExportBackup,
                         onImportBackup = onImportBackup
                     )

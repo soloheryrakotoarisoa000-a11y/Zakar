@@ -52,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import com.example.localization.AppLanguage
 import com.example.localization.TranslationStrings
 import com.example.ui.theme.DivineGold
+import androidx.compose.material.icons.filled.MusicNote
+import com.example.ui.components.RingtonePickerDialog
 import com.example.ui.theme.MidnightBlue
 
 @Composable
@@ -63,11 +65,14 @@ fun SettingsScreen(
     currentPin: String,
     vibrationEnabled: Boolean,
     themeMode: String,
+    currentRingtoneUri: String,
+    currentRingtoneTitle: String,
     onLanguageChange: (AppLanguage) -> Unit,
     onTitleChange: (String) -> Unit,
     onAppLockChange: (Boolean, String) -> Unit,
     onVibrationChange: (Boolean) -> Unit,
     onThemeChange: (String) -> Unit,
+    onRingtoneChange: (String, String) -> Unit,
     onExportBackup: ((String) -> Unit) -> Unit,
     onImportBackup: (String, (Boolean) -> Unit) -> Unit
 ) {
@@ -75,6 +80,7 @@ fun SettingsScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showTitleDialog by remember { mutableStateOf(false) }
     var showPinDialog by remember { mutableStateOf(false) }
+    var showRingtoneDialog by remember { mutableStateOf(false) }
     var showImportDialog by remember { mutableStateOf(false) }
     var importJsonText by remember { mutableStateOf("") }
 
@@ -189,6 +195,16 @@ fun SettingsScreen(
                     )
                 }
             }
+        }
+
+        // Phone Alarm Ringtone Selection Card
+        item {
+            SettingsCard(
+                title = strings.alarmRingtoneTitle,
+                subtitle = currentRingtoneTitle,
+                icon = Icons.Default.MusicNote,
+                onClick = { showRingtoneDialog = true }
+            )
         }
 
         // Backup and Restore
@@ -412,6 +428,19 @@ fun SettingsScreen(
                 OutlinedButton(onClick = { showImportDialog = false }) {
                     Text(strings.cancel)
                 }
+            }
+        )
+    }
+
+    if (showRingtoneDialog) {
+        RingtonePickerDialog(
+            strings = strings,
+            currentRingtoneUri = currentRingtoneUri,
+            currentRingtoneTitle = currentRingtoneTitle,
+            onDismiss = { showRingtoneDialog = false },
+            onSelectRingtone = { uri, title ->
+                onRingtoneChange(uri, title)
+                showRingtoneDialog = false
             }
         )
     }

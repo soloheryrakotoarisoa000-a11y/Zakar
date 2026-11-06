@@ -7,14 +7,19 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import android.media.RingtoneManager
+import android.net.Uri
 import com.example.MainActivity
 import com.example.R
 import com.example.ZakarApp
 import com.example.alarm.AlarmScheduler
+import com.example.alarm.RingtoneHelper
+import com.example.data.PreferencesManager
 import com.example.data.db.ZakarDatabase
 import com.example.data.model.MinistryTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -32,6 +37,23 @@ class AlarmReceiver : BroadcastReceiver() {
 
         when (action) {
             ACTION_ALARM_TRIGGER -> {
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val prefs = PreferencesManager(context)
+                        val ringtoneUriStr = prefs.alarmRingtoneUriFlow.first()
+                        if (ringtoneUriStr.isNotEmpty()) {
+                            RingtoneHelper.playPreview(context, ringtoneUriStr)
+                        } else {
+                            val defaultAlarm = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                            if (defaultAlarm != null) {
+                                RingtoneHelper.playPreview(context, defaultAlarm.toString())
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // ignore
+                    }
+                }
+
                 showNotification(context, taskId, title, desc, category)
 
                 // If repeating, schedule next occurrence
@@ -40,7 +62,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 }
             }
             ACTION_SNOOZE -> {
-                // Dismiss active notification
+                RingtoneHelper.stopPreview()
                 notificationManager?.cancel(taskId.toInt())
 
                 // Reschedule in 10 minutes
@@ -57,6 +79,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 AlarmScheduler(context).scheduleTaskAlarm(dummyTask)
             }
             ACTION_COMPLETE -> {
+                RingtoneHelper.stopPreview()
                 // Dismiss notification
                 notificationManager?.cancel(taskId.toInt())
 

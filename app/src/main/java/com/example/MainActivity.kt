@@ -57,6 +57,8 @@ class MainActivity : ComponentActivity() {
             val lastConflictResult by viewModel.lastConflictResult.collectAsState()
             val currentPin by viewModel.appLockPin.collectAsState()
             val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
+            val alarmRingtoneUri by viewModel.alarmRingtoneUri.collectAsState()
+            val alarmRingtoneTitle by viewModel.alarmRingtoneTitle.collectAsState()
 
             val isDarkTheme = when (themeMode) {
                 "DARK" -> true
@@ -100,6 +102,8 @@ class MainActivity : ComponentActivity() {
                             appLockPin = currentPin,
                             vibrationEnabled = vibrationEnabled,
                             themeMode = themeMode,
+                            currentRingtoneUri = alarmRingtoneUri,
+                            currentRingtoneTitle = alarmRingtoneTitle,
                             onNavigate = { dest -> viewModel.navigateTo(dest) },
                             onToggleTaskComplete = { task -> viewModel.toggleTaskCompleted(task) },
                             onSaveTask = { task -> viewModel.saveTask(task) },
@@ -127,6 +131,7 @@ class MainActivity : ComponentActivity() {
                             onAppLockChange = { enabled, pin -> viewModel.configureAppLock(enabled, pin) },
                             onVibrationChange = { enabled -> viewModel.setVibration(enabled) },
                             onThemeChange = { mode -> viewModel.setTheme(mode) },
+                            onRingtoneChange = { uri, title -> viewModel.setAlarmRingtone(uri, title) },
                             onExportBackup = { callback -> viewModel.exportBackup(callback) },
                             onImportBackup = { json, callback -> viewModel.importBackup(json, callback) }
                         )
